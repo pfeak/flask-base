@@ -3,9 +3,9 @@ from datetime import datetime
 from flask import current_app
 
 from backend_server import db
-from backend_server.common.response import message, error, success
+from backend_server.common.response import error, success
 from backend_server.models.user import UserModel
-from backend_server.v1.account.utils import UserSchema
+from backend_server.v1.user.utils import UserSchema
 
 
 class AccountService:

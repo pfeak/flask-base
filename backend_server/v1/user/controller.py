@@ -2,9 +2,9 @@ from flask import request
 from flask_restx import Resource
 
 from backend_server.common.response import error
-from backend_server.v1.account.dto import AccountDto
-from backend_server.v1.account.service import AccountService
-from backend_server.v1.account.utils import UserSchema
+from backend_server.v1.user.dto import AccountDto
+from backend_server.v1.user.service import AccountService
+from backend_server.v1.user.utils import UserSchema
 
 api = AccountDto.namespace
 user_schema = UserSchema()

@@ -4,7 +4,7 @@ from backend_server.v1.common.dto import Dto
 
 
 class AccountDto:
-    namespace = Dto.init('Account', path='/account', description='account related api')
+    namespace = Dto.init('User', path='/user', description='user related api')
 
     request_patch_user = reqparse.RequestParser()
     request_patch_user.add_argument('alias', type=str, location='args', default='')
@@ -14,10 +14,10 @@ class AccountDto:
     request_get_user.add_argument('hours', type=int, location='args', help='time difference between local and utc')
 
     model_login: Model = namespace.model(
-        'Account',
+        'User',
         {
-            'username': fields.String(required=True, description='account name', example='admin'),
-            'password': fields.String(required=True, description='account password', example='password')
+            'username': fields.String(required=True, description='user name', example='admin'),
+            'password': fields.String(required=True, description='user password', example='password')
         },
         mask="{*}"
     )

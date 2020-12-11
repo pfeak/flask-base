@@ -1,7 +1,7 @@
 from flask import Blueprint
 from flask_restx import Api
 
-from backend_server.v1.account.dto import AccountDto
+from backend_server.v1.user.dto import AccountDto
 
 blueprint = Blueprint('api', __name__)
 
