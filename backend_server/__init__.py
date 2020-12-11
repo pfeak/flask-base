@@ -32,14 +32,6 @@ def create_app():
     mode = os.getenv("CONFIG_MODE", default="default")
     server.config.from_pyfile(os.path.join(os.getcwd(), dirname, config_by_name[mode]))
 
-    server.config.SWAGGER_UI_DOC_EXPANSION = 'list'
-    server.config['RESTX_MASK_HEADER'] = 'SP-Fields'  # 修改 mask 为其他, 默认 'X-Fields'
-    server.config['RESTX_MASK_SWAGGER'] = False  # 是否在 swagger ui 中开启 mask 模式(实际上关闭后也可以传 mask)
-    server.config['BUNDLE_ERRORS'] = True  # parse 提示所有错误
-    server.config['RESTX_VALIDATE'] = True  # 开启 model 参数错误校验
-    server.config['ERROR_404_HELP'] = False  # 关闭 404 返回的提示信息以免暴露接口
-    server.config['ERROR_INCLUDE_MESSAGE'] = True  # 关闭错误提示信息
-
     # Register extensions
     register_extensions(server)
     configure_logger(server)
