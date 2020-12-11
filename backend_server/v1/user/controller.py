@@ -1,4 +1,3 @@
-from flask import request
 from flask_restx import Resource
 
 from backend_server.common.response import error
@@ -35,35 +34,3 @@ class UserRsrc(Resource):
         hours = hours if hours > 0 else 0
 
         return AccountService.get_user(username, hours)
-
-
-@api.route('/register')
-class RegisterRsrc(Resource):
-    @api.expect(UserDto.model_login)
-    @api.marshal_with(UserDto.model_resp, code=201, description='user created', skip_none=True)
-    def post(self):
-        """create new user"""
-        data = request.get_json()
-
-        if err := user_schema.validate(data, partial=("alias",)):
-            return error(400, err)
-
-        return AccountService.register(data)
-
-
-@api.route('/login')
-class LoginRsrc(Resource):
-    @api.expect(UserDto.model_login)
-    @api.marshal_with(UserDto.model_resp, code=201, description='success')
-    def post(self):
-        """user login"""
-        return "user login", 200
-
-
-@api.route('/logout')
-class LogoutRsrc(Resource):
-    @api.expect(UserDto.model_user)
-    @api.marshal_with(UserDto.model_resp, code=201, description='success')
-    def post(self):
-        """user logout"""
-        return "user logout", 200

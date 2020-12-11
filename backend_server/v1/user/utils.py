@@ -19,7 +19,7 @@ class UserSchema(Schema):
     created = fields.DateTime(dump_only=True)
     updated = fields.DateTime(dump_only=True)
 
-    def __init__(self, hours: int = 0):
+    def __init__(self, hours: int = 8):
         super(UserSchema, self).__init__()
         self.hours = hours
 

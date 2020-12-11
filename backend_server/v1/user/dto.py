@@ -8,10 +8,18 @@ class UserDto:
 
     request_patch_user = reqparse.RequestParser()
     request_patch_user.add_argument('alias', type=str, location='args', default='')
-    request_patch_user.add_argument('hours', type=int, location='args', help='time difference between local and utc')
+    request_patch_user.add_argument('hours',
+                                    type=int,
+                                    location='args',
+                                    default=8,
+                                    help='time difference between local and utc')
 
     request_get_user = reqparse.RequestParser()
-    request_get_user.add_argument('hours', type=int, location='args', help='time difference between local and utc')
+    request_get_user.add_argument('hours',
+                                  type=int,
+                                  location='args',
+                                  default=8,
+                                  help='time difference between local and utc')
 
     model_login: Model = namespace.model(
         'User',

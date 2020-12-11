@@ -6,7 +6,7 @@ from flask import Flask
 from gevent import monkey
 from loguru import logger
 
-from backend_server.extensions import db, bc
+from backend_server.extensions import db, bc, jwt
 
 # monkey.patch_all()
 
@@ -16,6 +16,45 @@ config_by_name = dict(
     prod="prod.cfg",
     default="dev.cfg",
 )
+
+
+class InterceptHandler(logging.Handler):
+    def emit(self, record):
+        logger_opt = logger.opt(depth=6, exception=record.exc_info)
+        logger_opt.log(record.levelname, record.getMessage())
+
+
+def register_logger(server):
+    try:
+        logger.remove(0)
+    except ValueError:
+        pass
+
+    fmt = '<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</green> ' \
+          '| <level>{level: <6}</level> | {name} - <level>{message}</level>'
+
+    # add normal logger
+    logger.add(sys.stdout, colorize=True, format=fmt, level=server.config['LOG_LEVEL'])
+    # add file logger
+    logger.add(
+        # './log/runtime_{time}.log',
+        './log/runtime.log',
+        enqueue=True,
+        rotation='10 MB',
+        retention='30 days',
+        level=server.config['LOG_LEVEL'])
+
+    # replace root logger
+    server.logger.removeHandler(server.logger.handlers[0])
+    server.logger.root.addHandler(InterceptHandler())
+
+
+def register_extensions(server):
+    """Register flask extensions"""
+    register_logger(server)
+    db.init_app(server)
+    bc.init_app(server)
+    jwt.init_app(server)
 
 
 def create_app():
@@ -34,7 +73,6 @@ def create_app():
 
     # Register extensions
     register_extensions(server)
-    configure_logger(server)
 
     # Register blueprints
     from backend_server.v1 import blueprint as api_v1_blueprint
@@ -46,39 +84,3 @@ def create_app():
         db.create_all()
 
     return server
-
-
-def register_extensions(server):
-    """Register flask extensions"""
-    db.init_app(server)
-    bc.init_app(server)
-
-
-class InterceptHandler(logging.Handler):
-    def emit(self, record):
-        logger_opt = logger.opt(depth=6, exception=record.exc_info)
-        logger_opt.log(record.levelname, record.getMessage())
-
-
-def configure_logger(server):
-    try:
-        logger.remove(0)
-    except ValueError:
-        pass
-
-    fmt = '<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</green> ' \
-          '| <level>{level: <6}</level> | {name} - <level>{message}</level>'
-
-    # add normal logger
-    logger.add(sys.stdout, colorize=True, format=fmt, level=server.config['LOG_LEVEL'])
-    # add file logger
-    logger.add(
-        './log/runtime_{time}.log',
-        enqueue=True,
-        rotation='10 MB',
-        retention='30 days',
-        level=server.config['LOG_LEVEL'])
-
-    # replace root logger
-    server.logger.removeHandler(server.logger.handlers[0])
-    server.logger.root.addHandler(InterceptHandler())

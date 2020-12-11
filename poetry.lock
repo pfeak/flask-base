@@ -154,6 +154,28 @@ url = "https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple"
 
 [[package]]
 category = "main"
+description = "Extended JWT integration with Flask"
+name = "flask-jwt-extended"
+optional = false
+python-versions = "*"
+version = "3.25.0"
+
+[package.dependencies]
+Flask = ">=1.0,<2.0"
+PyJWT = ">=1.6.4,<2.0"
+Werkzeug = ">=0.14"
+six = "*"
+
+[package.extras]
+asymmetric_crypto = ["cryptography (>=2.3)"]
+
+[package.source]
+reference = "tsinghua"
+type = "legacy"
+url = "https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple"
+
+[[package]]
+category = "main"
 description = "Fully featured framework for fast, easy and documented API development with Flask"
 name = "flask-restx"
 optional = false
@@ -339,6 +361,24 @@ url = "https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple"
 
 [[package]]
 category = "main"
+description = "JSON Web Token implementation in Python"
+name = "pyjwt"
+optional = false
+python-versions = "*"
+version = "1.7.1"
+
+[package.extras]
+crypto = ["cryptography (>=1.4)"]
+flake8 = ["flake8", "flake8-import-order", "pep8-naming"]
+test = ["pytest (>=4.0.1,<5.0.0)", "pytest-cov (>=2.6.0,<3.0.0)", "pytest-runner (>=4.2,<5.0.0)"]
+
+[package.source]
+reference = "tsinghua"
+type = "legacy"
+url = "https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple"
+
+[[package]]
+category = "main"
 description = "Persistent/Functional/Immutable data structures"
 name = "pyrsistent"
 optional = false
@@ -436,7 +476,7 @@ type = "legacy"
 url = "https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple"
 
 [metadata]
-content-hash = "a127bef6574f10a1b58e0c1402c357a613607e746ebf88f17f0a099a77863a31"
+content-hash = "950b83ebcb697dfa0a65d2f44a8615976ae7d3b808a3df29b0d1ca1daf39cde1"
 lock-version = "1.0"
 python-versions = "^3.8"
 
@@ -515,6 +555,9 @@ flask-cors = [
     {file = "Flask-Cors-3.0.9.tar.gz", hash = "sha256:6bcfc100288c5d1bcb1dbb854babd59beee622ffd321e444b05f24d6d58466b8"},
     {file = "Flask_Cors-3.0.9-py2.py3-none-any.whl", hash = "sha256:cee4480aaee421ed029eaa788f4049e3e26d15b5affb6a880dade6bafad38324"},
 ]
+flask-jwt-extended = [
+    {file = "Flask-JWT-Extended-3.25.0.tar.gz", hash = "sha256:b2e4dba91661e4697b30269106386c2b29e416a00d9ff66b26c462edddc10078"},
+]
 flask-restx = [
     {file = "flask-restx-0.2.0.tar.gz", hash = "sha256:ca87a1808333f4ec5a50a5740b44e6cd3879a4b940d559df3996877ec4a2f2a5"},
     {file = "flask_restx-0.2.0-py2.py3-none-any.whl", hash = "sha256:a1653da19ca0b5e5c2ea59bd5f4639a7749e6a9b882f459de1814ed37872253b"},
@@ -585,6 +628,10 @@ marshmallow = [
 pycparser = [
     {file = "pycparser-2.20-py2.py3-none-any.whl", hash = "sha256:7582ad22678f0fcd81102833f60ef8d0e57288b6b5fb00323d101be910e35705"},
     {file = "pycparser-2.20.tar.gz", hash = "sha256:2d475327684562c3a96cc71adf7dc8c4f0565175cf86b6d7a404ff4c771f15f0"},
+]
+pyjwt = [
+    {file = "PyJWT-1.7.1-py2.py3-none-any.whl", hash = "sha256:5c6eca3c2940464d106b99ba83b00c6add741c9becaec087fb7ccdefea71350e"},
+    {file = "PyJWT-1.7.1.tar.gz", hash = "sha256:8d59a976fb773f3e6a39c85636357c4f0e242707394cadadd9814f5cbaa20e96"},
 ]
 pyrsistent = [
     {file = "pyrsistent-0.17.3.tar.gz", hash = "sha256:2e636185d9eb976a18a8a8e96efce62f2905fea90041958d8cc2a189756ebf3e"},

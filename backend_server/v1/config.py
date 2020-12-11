@@ -1,0 +1,1 @@
+DEFAULT_HOURS = 8
