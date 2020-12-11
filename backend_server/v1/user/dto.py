@@ -3,7 +3,7 @@ from flask_restx import fields, Model, reqparse
 from backend_server.v1.common.dto import Dto
 
 
-class AccountDto:
+class UserDto:
     namespace = Dto.init('User', path='/user', description='user related api')
 
     request_patch_user = reqparse.RequestParser()

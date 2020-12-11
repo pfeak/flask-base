@@ -1,7 +1,7 @@
 from flask import Blueprint
 from flask_restx import Api
 
-from backend_server.v1.user.dto import AccountDto
+from backend_server.v1.user.dto import UserDto
 
 blueprint = Blueprint('api', __name__)
 
@@ -11,4 +11,4 @@ api = Api(blueprint,
           description='Flask Server: restful API server.',
           security='Bearer Auth')
 
-api.add_namespace(AccountDto.namespace)
+api.add_namespace(UserDto.namespace)
