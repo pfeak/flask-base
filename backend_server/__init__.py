@@ -6,7 +6,7 @@ from flask import Flask
 from gevent import monkey
 from loguru import logger
 
-from backend_server.extensions import db, bc, jwt
+from backend_server.extensions import db, bc, jwt, migrate
 
 # monkey.patch_all()
 
@@ -45,7 +45,8 @@ def register_logger(server):
         level=server.config['LOG_LEVEL'])
 
     # replace root logger
-    server.logger.removeHandler(server.logger.handlers[0])
+    if len(server.logger.handlers) != 0:
+        server.logger.removeHandler(server.logger.handlers[0])
     server.logger.root.addHandler(InterceptHandler())
 
 
@@ -53,6 +54,7 @@ def register_extensions(server):
     """Register flask extensions"""
     register_logger(server)
     db.init_app(server)
+    migrate.init_app(server)
     bc.init_app(server)
     jwt.init_app(server)
 
