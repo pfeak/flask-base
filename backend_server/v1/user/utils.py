@@ -1,7 +1,7 @@
 from marshmallow import Schema, fields, pre_load, post_load, validates, ValidationError, pre_dump, post_dump
 from marshmallow.validate import Length, Regexp
 
-from backend_server.models.common import TimeUtils
+from backend_server.common.base import TimeUtils
 from backend_server.models.user import UserModel
 
 

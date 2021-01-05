@@ -1,3 +1,4 @@
+import datetime
 import logging
 import os
 import sys
@@ -6,7 +7,8 @@ from flask import Flask
 from gevent import monkey
 from loguru import logger
 
-from backend_server.extensions import db, bc, jwt, migrate
+from backend_server.common import g_config
+from backend_server.extensions import db, bc, jwt, migrate, redis
 
 # monkey.patch_all()
 
@@ -50,6 +52,12 @@ def register_logger(server):
     server.logger.root.addHandler(InterceptHandler())
 
 
+def register_globals(server):
+    g_config['JWT_ACCESS_EXPIRE'] = server.config['JWT_ACCESS_TOKEN_EXPIRES']
+    g_config['JWT_REFRESH_EXPIRE'] = server.config['JWT_REFRESH_TOKEN_EXPIRES']
+    g_config['TIME_ZONE'] = int(server.config['TIME_ZONE'])
+
+
 def register_extensions(server):
     """Register flask extensions"""
     register_logger(server)
@@ -57,6 +65,9 @@ def register_extensions(server):
     migrate.init_app(server)
     bc.init_app(server)
     jwt.init_app(server)
+    redis.init_app(server)
+    server.config['JWT_ACCESS_TOKEN_EXPIRES'] = datetime.timedelta(minutes=server.config['JWT_ACCESS_EXPIRE'])
+    server.config['JWT_REFRESH_TOKEN_EXPIRES'] = datetime.timedelta(days=server.config['JWT_REFRESH_EXPIRE'])
 
 
 def create_app():
@@ -75,6 +86,9 @@ def create_app():
 
     # Register extensions
     register_extensions(server)
+
+    # Register global variables
+    register_globals(server)
 
     # Register blueprints
     from backend_server.v1 import blueprint as api_v1_blueprint

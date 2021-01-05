@@ -1,5 +1,7 @@
 from datetime import datetime
 
+from sqlalchemy import UniqueConstraint
+
 from backend_server import db, bc
 
 Column = db.Column
@@ -14,8 +16,14 @@ class UserModel(db.Model):
     username = Column(db.String(64), unique=True, index=True)
     password_hash = Column(db.String(128), nullable=False)
     alias = Column(db.String(15), unique=True, index=True)
+    avatar = Column(db.Text, nullable=True)
     created = Column(db.DateTime, nullable=False, default=datetime.utcnow)
     updated = Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    __table_args__ = (
+        UniqueConstraint('username', 'id', name='idx_username_id'),
+        db.Index('user_created_index', username, created),
+    )
 
     def __init__(self, **kwargs):
         super(UserModel, self).__init__(**kwargs)

@@ -1,15 +1,21 @@
-from flask_jwt_extended import create_access_token
+import datetime
 
-from backend_server import db
+from flask import current_app
+from flask_jwt_extended import create_access_token, create_refresh_token, get_jti, get_jwt_identity, get_raw_jwt
+
+from backend_server import db, redis, g_config
 from backend_server.common.response import error, success
 from backend_server.models.user import UserModel
 from backend_server.v1.auth.utils import LoginSchema
-from backend_server.v1.config import DEFAULT_HOURS
+
+ACCESS_EXPIRE = g_config['JWT_ACCESS_EXPIRE'] * 1.2
+REFRESH_EXPIRE = g_config['JWT_REFRESH_EXPIRE'] * 1.2
+login_schema = LoginSchema(g_config['TIME_ZONE'])
 
 
 class AuthService:
     @staticmethod
-    def register(data, hours: int = DEFAULT_HOURS):
+    def register(data):
         username = data.get("username")
         password = data.get("password")
 
@@ -23,14 +29,12 @@ class AuthService:
             db.session.add(new_user)
             db.session.commit()
 
-            login_schema = LoginSchema(hours)
-
             return success(201, "User registration is successful.", login_schema.dump(new_user))
         except Exception as e:
-            return error(500, e.args[0])
+            error(500, e.args[0])
 
     @staticmethod
-    def login(data, hours: int = DEFAULT_HOURS):
+    def login(data):
         username = data.get("username")
         password = data.get("password")
 
@@ -40,33 +44,55 @@ class AuthService:
         if not user.verify_password(password):
             error(403, "password is error.")
 
-        login_schema = LoginSchema(hours)
-
+        # access_token = create_access_token(identity=username, fresh=timedelta(seconds=20))
+        # create token
         access_token = create_access_token(identity=username)
-        user.token = access_token
+        refresh_token = create_refresh_token(identity=username)
+        # update redis
+        access_jti = get_jti(encoded_token=access_token)
+        refresh_jti = get_jti(encoded_token=refresh_token)
+        redis.set(access_jti, 'false', ACCESS_EXPIRE)
+        redis.set(refresh_jti, 'false', REFRESH_EXPIRE)
 
-        return success(201, "User login success.", login_schema.dump(user))
+        response = {
+            'user': user,
+            'access_token': access_token,
+            'refresh_token': refresh_token
+        }
 
+        return success(201, "User login success.", login_schema.dump(response))
 
-# @staticmethod
-# def modify(data, hours: int = 0):
-#     username = data.get("username")
-#     alias = data.get("alias")
-#
-#     try:
-#         user: UserModel = UserModel.query.filter_by(username=username).first()
-#         if not user:
-#             return error(404, "User is not exist.")
-#
-#         user.alias = alias
-#
-#         db.session.commit()
-#
-#         user_schema = UserSchema(hours)
-#
-#         new_user = user_schema.dump(user)
-#
-#         return success(201, "User modify success.", new_user)
-#     except Exception as e:
-#         current_app.logger.error(e)
-#         return error(500, e.args[0])
+    @staticmethod
+    def logout():
+        jti = get_raw_jwt()['jti']
+        redis.set(jti, 'true', ACCESS_EXPIRE)
+
+        # get user info
+        username = get_jwt_identity()
+        if not (user := UserModel.query.filter_by(username=username).first()):
+            error(403, "Username is not exists.")
+
+        response = {
+            'user': user
+        }
+
+        return success(200, "User logout success.", login_schema.dump(response))
+
+    @staticmethod
+    def refresh(refresh_token):
+        # create new access token
+        username = get_jwt_identity()
+        access_token = create_access_token(identity=username)
+        access_jti = get_jti(encoded_token=access_token)
+        redis.set(access_jti, 'false', ACCESS_EXPIRE)
+        # get user info
+        if not (user := UserModel.query.filter_by(username=username).first()):
+            error(403, "Username is not exists.")
+
+        response = {
+            'user': user,
+            'access_token': access_token,
+            'refresh_token': refresh_token
+        }
+
+        return success(200, "User login success.", login_schema.dump(response))

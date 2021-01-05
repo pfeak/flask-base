@@ -1,5 +1,6 @@
 from flask import request
-from flask_jwt_extended import jwt_required
+from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt_claims, fresh_jwt_required, \
+    jwt_refresh_token_required
 from flask_restx import Resource
 
 from backend_server.common.response import error
@@ -12,9 +13,9 @@ login_schema = LoginSchema()
 
 
 @api.route('/register')
-class RegisterRsrc(Resource):
-    @api.expect(AuthDto.model_login)
-    @api.marshal_with(AuthDto.model_resp, code=201, description='user created', skip_none=True)
+class AccountRegisterRsrc(Resource):
+    @api.expect(AuthDto.auth_login)
+    @api.marshal_with(AuthDto.auth_resp, code=201, description='user created', skip_none=True)
     def post(self):
         """user create"""
         data = request.get_json()
@@ -26,9 +27,9 @@ class RegisterRsrc(Resource):
 
 
 @api.route('/login')
-class LoginRsrc(Resource):
-    @api.expect(AuthDto.model_login)
-    @api.marshal_with(AuthDto.model_resp, code=201, description='success')
+class AccountLoginRsrc(Resource):
+    @api.expect(AuthDto.auth_login)
+    @api.marshal_with(AuthDto.auth_resp, code=201, description='success')
     def post(self):
         """user login"""
         data = request.get_json()
@@ -40,10 +41,26 @@ class LoginRsrc(Resource):
 
 
 @api.route('/logout')
-class LogoutRsrc(Resource):
-    @api.expect(AuthDto.model_login)
-    @api.marshal_with(AuthDto.model_resp, code=201, description='success')
+class AccountLogoutRsrc(Resource):
+    @api.marshal_with(AuthDto.auth_resp, code=200, description='success')
     @jwt_required
     def post(self):
         """user logout"""
-        return "user logout", 200
+        return AuthService.logout()
+
+
+@api.route('/refresh')
+class AccountRefreshRsrc(Resource):
+    @api.marshal_with(AuthDto.auth_resp, code=200, description='success')
+    @jwt_refresh_token_required
+    def get(self):
+        """user access token refresh"""
+        refresh_token = request.headers.environ['HTTP_AUTHORIZATION'].split(' ')[-1]
+        return AuthService.refresh(refresh_token)
+
+
+@api.route('/account')
+class AccountRsrc(Resource):
+    @fresh_jwt_required
+    def post(self):
+        """modify account auth info(eg. username or password)"""

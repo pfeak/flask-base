@@ -1,1 +1,1 @@
-from backend_server.v1.auth.controller import RegisterRsrc
+from backend_server.v1.auth.controller import *
