@@ -1,10 +1,10 @@
-from flask_restx import fields, Model, reqparse
+from flask_restx import fields, Model, reqparse, Namespace
 
 from backend_server.v1.common.dto import Dto
 
 
 class UserDto:
-    namespace = Dto.init('User', path='/user', description='user related api')
+    namespace = Namespace('User', path='/user', description='user related api')
 
     request_patch_user = reqparse.RequestParser()
     request_patch_user.add_argument('alias', type=str, location='args', default='')

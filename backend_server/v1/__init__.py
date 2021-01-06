@@ -4,7 +4,6 @@ from flask_restx import Api
 from backend_server.v1.auth.dto import AuthDto
 from backend_server.v1.user.dto import UserDto
 
-
 # https://flask-restx.readthedocs.io/en/latest/swagger.html?highlight=authorizations#documenting-authorizations
 # https://swagger.io/docs/specification/2-0/authentication/
 authorizations = {
@@ -35,15 +34,27 @@ authorizations = {
     # }
 }
 
-blueprint = Blueprint('api', __name__)
+auth_blueprint = Blueprint('auth', __name__)
+api_v1_blueprint = Blueprint('api_v1', __name__)
 
-api = Api(blueprint,
-          version='1.0',
-          title='Backend Server API.',
-          description='Flask Server: restful API server.',
-          security='Bearer',
-          authorizations=authorizations
-          )
+auth = Api(auth_blueprint,
+           version='1.0',
+           title='Backend Server(AUTH).',
+           description='Flask Server: restful API server.',
+           security='Bearer',
+           authorizations=authorizations
+           )
 
-api.add_namespace(UserDto.namespace)
-api.add_namespace(AuthDto.namespace)
+api_v1 = Api(api_v1_blueprint,
+             version='1.0',
+             title='Backend Server(API).',
+             description='Flask Server: restful API server.',
+             security='Bearer',
+             authorizations=authorizations
+             )
+
+# add auth resource
+auth.add_namespace(AuthDto.namespace)
+
+# add api resource
+api_v1.add_namespace(UserDto.namespace)

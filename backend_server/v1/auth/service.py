@@ -1,6 +1,3 @@
-import datetime
-
-from flask import current_app
 from flask_jwt_extended import create_access_token, create_refresh_token, get_jti, get_jwt_identity, get_raw_jwt
 
 from backend_server import db, redis, g_config
@@ -64,6 +61,7 @@ class AuthService:
 
     @staticmethod
     def logout():
+        # todo: logout 的时候 access 和 refresh 都需要拉黑
         jti = get_raw_jwt()['jti']
         redis.set(jti, 'true', ACCESS_EXPIRE)
 

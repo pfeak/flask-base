@@ -91,8 +91,10 @@ def create_app():
     register_globals(server)
 
     # Register blueprints
-    from backend_server.v1 import blueprint as api_v1_blueprint
+    from backend_server.v1 import auth_blueprint
+    from backend_server.v1 import api_v1_blueprint
 
+    server.register_blueprint(auth_blueprint, url_prefix='/auth')
     server.register_blueprint(api_v1_blueprint, url_prefix='/api/v1')
 
     # Create tables is not exist

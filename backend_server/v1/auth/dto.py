@@ -4,7 +4,7 @@ from backend_server.v1.common.dto import Dto, CommonUserDto
 
 
 class AuthDto:
-    namespace = Namespace('auth', path='/auth', description='auth related api')
+    namespace = Namespace('token', path='/token', description='token related api')
 
     auth_login: Model = namespace.model(
         'Auth-login',
@@ -25,4 +25,6 @@ class AuthDto:
         mask="{*}"
     )
     # register models
+    namespace.models[CommonUserDto.user_model.name] = CommonUserDto.user_model
+
     auth_resp: Model = Dto.set_resp(namespace, auth_user)
