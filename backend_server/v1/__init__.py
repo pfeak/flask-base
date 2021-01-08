@@ -9,18 +9,18 @@ from backend_server.v1.user.dto import UserDto
 authorizations = {
     'Bearer': {
         'type': 'apiKey',
-        'in': 'header',
+        'in': 'cookie',
         'name': 'Authorization'
     },
-    'apiKey': {
+    'X-CSRF-TOKEN': {
         'type': 'apiKey',
         'in': 'header',  # header query
-        'name': 'X-API'
+        'name': 'X-CSRF-TOKEN'
     },
     'apiId': {
         'type': 'apiKey',
         'in': 'header',
-        'name': 'Y-API'
+        'name': 'refresh_csrf'
     },
     # 'oauth2': {
     #     'type': 'oauth2',
@@ -41,7 +41,7 @@ auth = Api(auth_blueprint,
            version='1.0',
            title='Backend Server(AUTH).',
            description='Flask Server: restful API server.',
-           security='Bearer',
+           security='X-CSRF-TOKEN',
            authorizations=authorizations
            )
 
@@ -49,7 +49,7 @@ api_v1 = Api(api_v1_blueprint,
              version='1.0',
              title='Backend Server(API).',
              description='Flask Server: restful API server.',
-             security='Bearer',
+             security='X-CSRF-TOKEN',
              authorizations=authorizations
              )
 

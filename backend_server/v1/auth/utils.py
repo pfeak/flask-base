@@ -24,8 +24,8 @@ class LoginSchema(Schema):
         unknown = EXCLUDE
 
     user = fields.Nested(UserSchema)
-    access_token = fields.String(missing=None)
-    refresh_token = fields.String(missing=None)
+    access_csrf = fields.String(missing=None)
+    refresh_csrf = fields.String(missing=None)
 
     def __init__(self, hours: int = 8):
         super(LoginSchema, self).__init__()

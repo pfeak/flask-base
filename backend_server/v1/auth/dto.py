@@ -4,7 +4,7 @@ from backend_server.v1.common.dto import Dto, CommonUserDto
 
 
 class AuthDto:
-    namespace = Namespace('token', path='/token', description='token related api')
+    namespace = Namespace('auth', path='/', description='token related api')
 
     auth_login: Model = namespace.model(
         'Auth-login',
@@ -19,8 +19,8 @@ class AuthDto:
         "Auth",
         {
             "user": fields.Nested(CommonUserDto.user_model),
-            "access_token": fields.String(description='access token'),
-            "refresh_token": fields.String(description='refresh token'),
+            'access_csrf': fields.String(description='csrf access token'),
+            'refresh_csrf': fields.String(description='csrf refresh token'),
         },
         mask="{*}"
     )

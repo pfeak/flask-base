@@ -29,7 +29,7 @@ class AccountRegisterRsrc(Resource):
 @api.route('/login')
 class AccountLoginRsrc(Resource):
     @api.expect(AuthDto.auth_login)
-    @api.marshal_with(AuthDto.auth_resp, code=201, description='success')
+    @api.response(code=201, description='success', model=AuthDto.auth_resp)
     def post(self):
         """user login"""
         data = request.get_json()
@@ -42,25 +42,24 @@ class AccountLoginRsrc(Resource):
 
 @api.route('/logout')
 class AccountLogoutRsrc(Resource):
-    @api.marshal_with(AuthDto.auth_resp, code=200, description='success')
+    @api.marshal_with(AuthDto.auth_resp, code=204, description='success')
     @jwt_required
-    def post(self):
+    def delete(self):
         """user logout"""
         return AuthService.logout()
 
 
 @api.route('/refresh')
 class AccountRefreshRsrc(Resource):
-    @api.marshal_with(AuthDto.auth_resp, code=200, description='success')
+    @api.response(code=201, description='success', model=AuthDto.auth_resp)
     @jwt_refresh_token_required
-    def get(self):
+    def post(self):
         """user access token refresh"""
-        refresh_token = request.headers.environ['HTTP_AUTHORIZATION'].split(' ')[-1]
-        return AuthService.refresh(refresh_token)
+        return AuthService.refresh(request.cookies['refresh_token_cookie'])
 
 
 @api.route('/account')
 class AccountRsrc(Resource):
-    @fresh_jwt_required
+    @jwt_required
     def post(self):
         """modify account auth info(eg. username or password)"""

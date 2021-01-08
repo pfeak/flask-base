@@ -1,4 +1,6 @@
-from flask_jwt_extended import create_access_token, create_refresh_token, get_jti, get_jwt_identity, get_raw_jwt
+from flask import Response, jsonify
+from flask_jwt_extended import create_access_token, create_refresh_token, get_jti, get_jwt_identity, get_raw_jwt, \
+    set_access_cookies, set_refresh_cookies, get_csrf_token
 
 from backend_server import db, redis, g_config
 from backend_server.common.response import error, success
@@ -42,6 +44,8 @@ class AuthService:
             error(403, "password is error.")
 
         # access_token = create_access_token(identity=username, fresh=timedelta(seconds=20))
+        # https://flask-jwt-extended.readthedocs.io/en/stable/blacklist_and_token_revoking/
+        # https://github.com/vimalloc/flask-jwt-extended/blob/master/examples/redis_blacklist.py
         # create token
         access_token = create_access_token(identity=username)
         refresh_token = create_refresh_token(identity=username)
@@ -51,13 +55,21 @@ class AuthService:
         redis.set(access_jti, 'false', ACCESS_EXPIRE)
         redis.set(refresh_jti, 'false', REFRESH_EXPIRE)
 
-        response = {
+        # set tokens at cookie && set csrf token
+        # https://flask-jwt-extended.readthedocs.io/en/stable/tokens_in_cookies/
+        data = {
             'user': user,
-            'access_token': access_token,
-            'refresh_token': refresh_token
+            'access_csrf': get_csrf_token(access_token),
+            'refresh_csrf': get_csrf_token(refresh_token)
         }
+        data = login_schema.dump(data)
+        obj, _ = success(201, "User login success.", data)
+        response: Response = jsonify(obj)
+        set_access_cookies(response, access_token)
+        set_refresh_cookies(response, refresh_token)
 
-        return success(201, "User login success.", login_schema.dump(response))
+        response.status_code = 201
+        return response
 
     @staticmethod
     def logout():
@@ -74,23 +86,34 @@ class AuthService:
             'user': user
         }
 
-        return success(200, "User logout success.", login_schema.dump(response))
+        return success(204, "User logout success.", login_schema.dump(response))
 
     @staticmethod
     def refresh(refresh_token):
-        # create new access token
         username = get_jwt_identity()
-        access_token = create_access_token(identity=username)
-        access_jti = get_jti(encoded_token=access_token)
-        redis.set(access_jti, 'false', ACCESS_EXPIRE)
+
         # get user info
         if not (user := UserModel.query.filter_by(username=username).first()):
             error(403, "Username is not exists.")
 
-        response = {
-            'user': user,
-            'access_token': access_token,
-            'refresh_token': refresh_token
-        }
+        # create new access token
+        access_token = create_access_token(identity=username)
+        # update redis
+        access_jti = get_jti(encoded_token=access_token)
+        redis.set(access_jti, 'false', ACCESS_EXPIRE)
 
-        return success(200, "User login success.", login_schema.dump(response))
+        # set tokens at cookie && set csrf token
+        # https://flask-jwt-extended.readthedocs.io/en/stable/tokens_in_cookies/
+        data = {
+            'user': user,
+            'access_csrf': get_csrf_token(access_token),
+            'refresh_csrf': get_csrf_token(refresh_token)
+        }
+        data = login_schema.dump(data)
+        obj, _ = success(201, "Token refresh success.", data)
+        response: Response = jsonify(obj)
+        set_access_cookies(response, access_token)
+        set_refresh_cookies(response, refresh_token)
+
+        response.status_code = 201
+        return response

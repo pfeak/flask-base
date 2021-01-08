@@ -94,8 +94,8 @@ def create_app():
     from backend_server.v1 import auth_blueprint
     from backend_server.v1 import api_v1_blueprint
 
-    server.register_blueprint(auth_blueprint, url_prefix='/auth')
-    server.register_blueprint(api_v1_blueprint, url_prefix='/api/v1')
+    server.register_blueprint(auth_blueprint, url_prefix='/s/token')
+    server.register_blueprint(api_v1_blueprint, url_prefix='/s/api/v1')
 
     # Create tables is not exist
     with server.app_context():

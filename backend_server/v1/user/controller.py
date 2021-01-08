@@ -1,3 +1,4 @@
+from flask_jwt_extended import jwt_required
 from flask_restx import Resource
 
 from backend_server.common.response import error
@@ -34,3 +35,11 @@ class UserRsrc(Resource):
         hours = hours if hours > 0 else 0
 
         return AccountService.get_user(username, hours)
+
+
+@api.route('/account')
+class AccountRsrc(Resource):
+    # @fresh_jwt_required
+    @jwt_required
+    def post(self):
+        """modify account auth info(eg. username or password)"""
