@@ -14,6 +14,7 @@ login_schema = LoginSchema()
 
 @api.route('/register')
 class AccountRegisterRsrc(Resource):
+    @api.doc(security=[])
     @api.expect(AuthDto.auth_login)
     @api.marshal_with(AuthDto.auth_resp, code=201, description='user created', skip_none=True)
     def post(self):
@@ -28,6 +29,7 @@ class AccountRegisterRsrc(Resource):
 
 @api.route('/login')
 class AccountLoginRsrc(Resource):
+    @api.doc(security=[])
     @api.expect(AuthDto.auth_login)
     @api.response(code=201, description='success', model=AuthDto.auth_resp)
     def post(self):
@@ -42,15 +44,22 @@ class AccountLoginRsrc(Resource):
 
 @api.route('/logout')
 class AccountLogoutRsrc(Resource):
+    @api.doc(security=['ACCESS-CSRF-TOKEN', 'REFRESH-CSRF-TOKEN'])
     @api.marshal_with(AuthDto.auth_resp, code=204, description='success')
     @jwt_required
+    @jwt_refresh_token_required
     def delete(self):
         """user logout"""
-        return AuthService.logout()
+        return AuthService.logout(
+            request.cookies['access_token_cookie'],
+            request.cookies['refresh_token_cookie']
+        )
 
 
+# todo: 一次性令牌
 @api.route('/refresh')
 class AccountRefreshRsrc(Resource):
+    @api.doc(security='REFRESH-CSRF-TOKEN')
     @api.response(code=201, description='success', model=AuthDto.auth_resp)
     @jwt_refresh_token_required
     def post(self):
