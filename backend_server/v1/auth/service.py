@@ -38,10 +38,10 @@ class AuthService:
         password = data.get("password")
 
         if not (user := UserModel.query.filter_by(username=username).first()):
-            error(403, "Username is not exists.")
+            error(400, "User is not exists.")
 
         if not user.verify_password(password):
-            error(403, "password is error.")
+            error(400, "password is error.")
 
         # access_token = create_access_token(identity=username, fresh=timedelta(seconds=20))
         # https://flask-jwt-extended.readthedocs.io/en/stable/blacklist_and_token_revoking/
@@ -72,21 +72,13 @@ class AuthService:
         return response
 
     @staticmethod
-    def logout():
-        # todo: logout 的时候 access 和 refresh 都需要拉黑
-        jti = get_raw_jwt()['jti']
-        redis.set(jti, 'true', ACCESS_EXPIRE)
+    def logout(access_token, refresh_token):
+        access_jti = get_jti(encoded_token=access_token)
+        refresh_jti = get_jti(encoded_token=refresh_token)
+        redis.set(access_jti, 'true', ACCESS_EXPIRE)
+        redis.set(refresh_jti, 'true', REFRESH_EXPIRE)
 
-        # get user info
-        username = get_jwt_identity()
-        if not (user := UserModel.query.filter_by(username=username).first()):
-            error(403, "Username is not exists.")
-
-        response = {
-            'user': user
-        }
-
-        return success(204, "User logout success.", login_schema.dump(response))
+        return success(204, "User logout success.")
 
     @staticmethod
     def refresh(refresh_token):
@@ -94,7 +86,7 @@ class AuthService:
 
         # get user info
         if not (user := UserModel.query.filter_by(username=username).first()):
-            error(403, "Username is not exists.")
+            error(400, "Username is not exists.")
 
         # create new access token
         access_token = create_access_token(identity=username)

@@ -12,15 +12,15 @@ authorizations = {
         'in': 'cookie',
         'name': 'Authorization'
     },
-    'X-CSRF-TOKEN': {
+    'ACCESS-CSRF-TOKEN': {
         'type': 'apiKey',
         'in': 'header',  # header query
-        'name': 'X-CSRF-TOKEN'
+        'name': 'ACCESS-CSRF-TOKEN'
     },
-    'apiId': {
+    'REFRESH-CSRF-TOKEN': {
         'type': 'apiKey',
         'in': 'header',
-        'name': 'refresh_csrf'
+        'name': 'REFRESH-CSRF-TOKEN'
     },
     # 'oauth2': {
     #     'type': 'oauth2',
@@ -41,7 +41,7 @@ auth = Api(auth_blueprint,
            version='1.0',
            title='Backend Server(AUTH).',
            description='Flask Server: restful API server.',
-           security='X-CSRF-TOKEN',
+           security='ACCESS-CSRF-TOKEN',
            authorizations=authorizations
            )
 
@@ -49,7 +49,7 @@ api_v1 = Api(api_v1_blueprint,
              version='1.0',
              title='Backend Server(API).',
              description='Flask Server: restful API server.',
-             security='X-CSRF-TOKEN',
+             security='ACCESS-CSRF-TOKEN',
              authorizations=authorizations
              )
 
