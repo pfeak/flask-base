@@ -18,7 +18,7 @@ class AccountRegisterRsrc(Resource):
     @api.expect(AuthDto.auth_login)
     @api.marshal_with(AuthDto.auth_resp, code=201, description='user created', skip_none=True)
     def post(self):
-        """user create"""
+        """User create"""
         data = request.get_json()
 
         if err := login_schema.validate(data):
@@ -33,7 +33,7 @@ class AccountLoginRsrc(Resource):
     @api.expect(AuthDto.auth_login)
     @api.response(code=201, description='success', model=AuthDto.auth_resp)
     def post(self):
-        """user login"""
+        """User login"""
         data = request.get_json()
 
         if err := login_schema.validate(data):
@@ -49,26 +49,48 @@ class AccountLogoutRsrc(Resource):
     @jwt_required
     @jwt_refresh_token_required
     def delete(self):
-        """user logout"""
+        """User logout"""
         return AuthService.logout(
             request.cookies['access_token_cookie'],
             request.cookies['refresh_token_cookie']
         )
 
 
-# todo: 一次性令牌
-@api.route('/refresh')
+@api.route('/refresh/access')
 class AccountRefreshRsrc(Resource):
-    @api.doc(security='REFRESH-CSRF-TOKEN')
     @api.response(code=201, description='success', model=AuthDto.auth_resp)
     @jwt_refresh_token_required
     def post(self):
-        """user access token refresh"""
+        """User one-time access token"""
         return AuthService.refresh(request.cookies['refresh_token_cookie'])
 
 
-@api.route('/account')
-class AccountRsrc(Resource):
+@api.route('/refresh/fresh_access')
+class AccountFreshRsrc(Resource):
+    @api.doc(security=['ACCESS-CSRF-TOKEN', 'REFRESH-CSRF-TOKEN'])
+    @api.response(code=201, description='success', model=AuthDto.auth_resp)
+    @jwt_refresh_token_required
     @jwt_required
     def post(self):
-        """modify account auth info(eg. username or password)"""
+        """User one-time fresh access token"""
+        return AuthService.fresh(
+            request.cookies['access_token_cookie'],
+            request.cookies['refresh_token_cookie']
+        )
+
+
+@api.route('/test1')
+class TestRsrc(Resource):
+    @api.doc(security='ACCESS-CSRF-TOKEN')
+    @jwt_required
+    def get(self):
+        """Fresh access token test"""
+
+
+@api.route('/test2')
+class TestFreshRsrc(Resource):
+    @api.doc(security=['ACCESS-CSRF-TOKEN', 'REFRESH-CSRF-TOKEN', 'FRESH-CSRF-TOKEN'])
+    @jwt_required
+    @fresh_jwt_required
+    def get(self):
+        """Dangerous operation test interface."""

@@ -7,12 +7,12 @@ from backend_server.v1.user.dto import UserDto
 # https://flask-restx.readthedocs.io/en/latest/swagger.html?highlight=authorizations#documenting-authorizations
 # https://swagger.io/docs/specification/2-0/authentication/
 authorizations = {
-    'Bearer': {
-        'type': 'apiKey',
-        'in': 'cookie',
-        'name': 'Authorization'
-    },
     'ACCESS-CSRF-TOKEN': {
+        'type': 'apiKey',
+        'in': 'header',  # header query
+        'name': 'ACCESS-CSRF-TOKEN'
+    },
+    'FRESH-CSRF-TOKEN': {
         'type': 'apiKey',
         'in': 'header',  # header query
         'name': 'ACCESS-CSRF-TOKEN'
@@ -41,7 +41,7 @@ auth = Api(auth_blueprint,
            version='1.0',
            title='Backend Server(AUTH).',
            description='Flask Server: restful API server.',
-           security='ACCESS-CSRF-TOKEN',
+           security='REFRESH-CSRF-TOKEN',
            authorizations=authorizations
            )
 

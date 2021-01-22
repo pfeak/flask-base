@@ -27,6 +27,7 @@ class InterceptHandler(logging.Handler):
 
 
 def register_logger(server):
+    """Register default loggers"""
     try:
         logger.remove(0)
     except ValueError:
@@ -53,8 +54,10 @@ def register_logger(server):
 
 
 def register_globals(server):
+    """Register configs to global"""
     g_config['JWT_ACCESS_EXPIRE'] = server.config['JWT_ACCESS_TOKEN_EXPIRES']
     g_config['JWT_REFRESH_EXPIRE'] = server.config['JWT_REFRESH_TOKEN_EXPIRES']
+    g_config['JWT_FRESH_EXPIRE'] = server.config['JWT_FRESH_TOKEN_EXPIRES']
     g_config['TIME_ZONE'] = int(server.config['TIME_ZONE'])
 
 
@@ -66,8 +69,17 @@ def register_extensions(server):
     bc.init_app(server)
     jwt.init_app(server)
     redis.init_app(server)
+    # For flask-jwt default settings
     server.config['JWT_ACCESS_TOKEN_EXPIRES'] = datetime.timedelta(minutes=server.config['JWT_ACCESS_EXPIRE'])
     server.config['JWT_REFRESH_TOKEN_EXPIRES'] = datetime.timedelta(days=server.config['JWT_REFRESH_EXPIRE'])
+    server.config['JWT_FRESH_TOKEN_EXPIRES'] = datetime.timedelta(minutes=server.config['JWT_FRESH_EXPIRE'])
+
+
+def register_settings(server):
+    """Register file settings"""
+    dirname = os.getenv("CONFIG_DIR_NAME_FOR_DYNAMIC", default="config")
+    mode = os.getenv("CONFIG_MODE", default="default")
+    server.config.from_pyfile(os.path.join(os.getcwd(), dirname, config_by_name[mode]))
 
 
 def create_app():
@@ -80,9 +92,8 @@ def create_app():
     # todo: 日志 *
     server = Flask(__name__)
 
-    dirname = os.getenv("CONFIG_DIR_NAME_FOR_DYNAMIC", default="config")
-    mode = os.getenv("CONFIG_MODE", default="default")
-    server.config.from_pyfile(os.path.join(os.getcwd(), dirname, config_by_name[mode]))
+    # Register settings
+    register_settings(server)
 
     # Register extensions
     register_extensions(server)

@@ -16,7 +16,7 @@ from backend_server import jwt, redis
 #     return user
 
 
-# jwt_required 触发检测时调用
+# jwt_required, jwt_refresh_token_required 触发检测通过后都会调用
 @jwt.token_in_blacklist_loader
 def check_if_token_is_revoked(decrypted_token):
     jti = decrypted_token['jti']
