@@ -4,13 +4,11 @@ import os
 import sys
 
 from flask import Flask
-from gevent import monkey
 from loguru import logger
 
 from backend_server.common import g_config
 from backend_server.extensions import db, bc, jwt, migrate, redis
 
-# monkey.patch_all()
 
 config_by_name = dict(
     dev="dev.cfg",
@@ -83,13 +81,7 @@ def register_settings(server):
 
 
 def create_app():
-    # todo: 配置文件 *
-    # todo: 异常报错处理 *
-    # todo: 返回接口包裹 *
-    # todo: 错误返回解析地址提示关闭 *
-    # todo: 鉴权
     # todo: 后台管理
-    # todo: 日志 *
     server = Flask(__name__)
 
     # Register settings
