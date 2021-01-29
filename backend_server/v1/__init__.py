@@ -2,7 +2,6 @@ from flask import Blueprint
 from flask_restx import Api
 
 from backend_server.v1.auth.dto import AuthDto
-from backend_server.v1.user.dto import UserDto
 
 # https://flask-restx.readthedocs.io/en/latest/swagger.html?highlight=authorizations#documenting-authorizations
 # https://swagger.io/docs/specification/2-0/authentication/
@@ -55,6 +54,3 @@ api_v1 = Api(api_v1_blueprint,
 
 # add auth resource
 auth.add_namespace(AuthDto.namespace)
-
-# add api resource
-api_v1.add_namespace(UserDto.namespace)

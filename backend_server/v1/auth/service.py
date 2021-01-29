@@ -128,8 +128,7 @@ class AuthService:
         fresh_token = create_access_token(identity=username, fresh=g_config['JWT_ACCESS_EXPIRE'])
         # update redis
         access_jti = get_jti(encoded_token=fresh_token)
-        # todo: 测试
-        redis.set(access_jti, 'false', FRESH_EXPIRE * 1.2)
+        redis.set(access_jti, 'false', FRESH_EXPIRE)
 
         # set tokens at cookie && set csrf token
         # https://flask-jwt-extended.readthedocs.io/en/stable/tokens_in_cookies/

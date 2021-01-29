@@ -1,6 +1,5 @@
 from flask import request
-from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt_claims, fresh_jwt_required, \
-    jwt_refresh_token_required
+from flask_jwt_extended import jwt_required, fresh_jwt_required, jwt_refresh_token_required
 from flask_restx import Resource
 
 from backend_server.common.response import error
